@@ -179,7 +179,7 @@ it("should return no movie", async () => {
 describe("DELETE /api/movies/:id", () => {
   it("should delete movie", async () => {
     const newMovie = {
-      title: "Avatar",
+      title: "gqgqgqgqgq",
       director: "James Cameron",
       year: "2009",
       color: "1",
