@@ -176,4 +176,44 @@ expect(userInDatabase.language).toStrictEqual(updatedUser.language);
   })
   }) 
 });
+
+
+describe("DELETE /api/users/:id", () => {
+  it("should delete user", async () => {
+      const newUser = {
+        firstname: "Clara",
+        lastname: "Papa",
+        email: `${crypto.randomUUID()}@wild.co`,
+        city: "Madrid",
+        language: "French"  
+      };
+    const [result] = await database.query(
+      "INSERT INTO users(firstname, lastname, email, city, language) VALUES (?, ?, ?, ?, ?)",
+      [newUser.firstname, newUser.lastname, newUser.email, newUser.city, newUser.language]
+    );
+
+    const id = result.insertId;
+    
+
+    const response = await request(app)
+      .delete(`/api/users/${id}`);
+
+    expect(response.status).toEqual(204);
+
+    const [res] = await database.query("SELECT * FROM users WHERE id=?", id);
+
+  expect(res.length).toEqual(0);
+  });
+
+
+it("should return no user", async () => {
+  const deletedUser = null
+
+  const response = await request(app).delete("/api/movies/0").send(deletedUser);
+
+  expect(response.status).toEqual(404);
+});
+});
+
+
 afterAll(() => database.end());
