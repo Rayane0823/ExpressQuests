@@ -83,4 +83,90 @@ describe("POST /api/movies", () => {
   });
 });
 
-afterAll(() => database.end());
+
+
+
+
+
+
+describe("PUT /api/movies/:id", () => {
+  it("should edit movie", async () => {
+    const newMovie = {
+      title: "Avatar",
+      director: "James Cameron",
+      year: "2009",
+      color: "1",
+      duration: 162,
+    };
+    const [result] = await database.query(
+      "INSERT INTO movies(title, director, year, color, duration) VALUES (?, ?, ?, ?, ?)",
+      [newMovie.title, newMovie.director, newMovie.year, newMovie.color, newMovie.duration]
+    );
+
+    const id = result.insertId;
+    
+    const updatedMovie = {
+      title: "Wild is life",
+      director: "Alan Smithee",
+      year: "2023",
+      color: "0",
+      duration: 120,
+    };
+
+    const response = await request(app)
+      .put(`/api/movies/${id}`)
+      .send(updatedMovie);
+
+    expect(response.status).toEqual(204);
+
+    const [res] = await database.query("SELECT * FROM movies WHERE id=?", id);
+
+    const [movieInDatabase] = res;
+
+    expect(movieInDatabase).toHaveProperty("id");
+
+    expect(movieInDatabase).toHaveProperty("title");
+    expect(typeof movieInDatabase.title).toBe("string");
+    expect(movieInDatabase.title).toStrictEqual(updatedMovie.title);
+
+    expect(movieInDatabase).toHaveProperty("director");
+    expect(typeof movieInDatabase.director).toBe("string");
+    expect(movieInDatabase.director).toStrictEqual(updatedMovie.director);
+
+    expect(movieInDatabase).toHaveProperty("year");
+    expect(typeof movieInDatabase.year).toBe("string");
+    expect(movieInDatabase.year).toStrictEqual(updatedMovie.year);
+
+    expect(movieInDatabase).toHaveProperty("color");
+    expect(typeof movieInDatabase.color).toBe("string");
+    expect(movieInDatabase.color).toStrictEqual(updatedMovie.color);
+
+    expect(movieInDatabase).toHaveProperty("duration");
+    expect(typeof movieInDatabase.duration).toBe("number");
+    expect(movieInDatabase.duration).toStrictEqual(updatedMovie.duration);
+  });
+
+  it("should return an error", async () => {
+    const movieWithMissingProps = { title: "Harry Potter" };
+
+    const response = await request(app)
+      .put(`/api/movies/1`)
+      .send(movieWithMissingProps);
+
+    expect(response.status).toEqual(500);
+});
+it("should return no movie", async () => {
+  const newMovie = {
+    title: "Avatar",
+    director: "James Cameron",
+    year: "2009",
+    color: "1",
+    duration: 162,
+  };
+
+  const response = await request(app).put("/api/movies/0").send(newMovie);
+
+  expect(response.status).toEqual(404);
+});
+});
+afterAll(() => database.end())
