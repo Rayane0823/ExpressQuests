@@ -67,16 +67,20 @@ describe("POST /api/users", () => {
       const [userInDatabase] = result;
   
       expect(userInDatabase).toHaveProperty("firstname");
-      expect(typeof userInDatabase.firstname).toBe("string");
-      expect(userInDatabase).toHaveProperty("lastname");
-      expect(typeof userInDatabase.lastname).toBe("string");
-      expect(userInDatabase).toHaveProperty("email");
-      expect(typeof userInDatabase.email).toBe("string");
-      expect(userInDatabase).toHaveProperty("city");
-      expect(typeof userInDatabase.city).toBe("string");
-      expect(userInDatabase).toHaveProperty("language");
-      expect(typeof userInDatabase.language).toBe("string");
       expect(userInDatabase.email).toStrictEqual(newUser.email);
+   
+      expect(userInDatabase).toHaveProperty("lastname");
+      expect(userInDatabase.lastname).toStrictEqual(newUser.lastname);
+  
+      expect(userInDatabase).toHaveProperty("email");
+      expect(userInDatabase.email).toStrictEqual(newUser.email);
+
+      expect(userInDatabase).toHaveProperty("city");
+      expect(userInDatabase.city).toStrictEqual(newUser.city);
+
+      expect(userInDatabase).toHaveProperty("language");
+      expect(userInDatabase.language).toStrictEqual(newUser.language);
+
   
     });
   
@@ -90,7 +94,7 @@ describe("POST /api/users", () => {
           .post("/api/users")
           .send(userWithMissingProps);
     
-        expect(response.status).toEqual(500);
+          expect(response.status).toEqual(422);
     });
   });
 
@@ -154,7 +158,7 @@ expect(userInDatabase.language).toStrictEqual(updatedUser.language);
       .put(`/api/users/1`)
       .send(userWithMissingProps);
 
-      expect (response.status).toEqual(500);
+      expect(response.status).toEqual(422);
     });
 
   it("should return no movie", async () => {
